@@ -4,7 +4,11 @@ import * as async from 'async';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { AttributeIds, ClientSession, OPCUAClient } from 'node-opcua';
 
-require('dotenv').config();
+require('dotenv').config({
+  path: app.isPackaged
+    ? path.join(process.resourcesPath, '.env')
+    : path.resolve(process.cwd(), '.env')
+});
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
