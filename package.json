@@ -17,7 +17,8 @@
     "build-exe": "npm run build && electron-builder build --win portable"
   },
   "dependencies": {
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "node-opcua": "^2.64.0"
   },
   "devDependencies": {
     "@types/node": "^18.19.55",

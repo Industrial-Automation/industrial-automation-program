@@ -1,3 +1,31 @@
+interface LoggedUserType {
+  id: string;
+  email: string;
+  phone: string;
+  first_name: string;
+  last_name: string;
+  is_confirmed: boolean;
+}
+
+interface ProjectType {
+  id: string;
+  name: string;
+  opc_url: string;
+  opc_namespace_index: number;
+  created_at: string;
+  last_updated_at: string;
+}
+
+interface StateType {
+  user: LoggedUserType | null;
+  projects: ProjectType[];
+}
+
+const State: StateType = {
+  user: null,
+  projects: []
+};
+
 const fetchSignIn = async (email: string, password: string) => {
   const data = await fetch(`${window.config.API_URL}/auth/sign-in`, {
     method: 'POST',
@@ -54,16 +82,10 @@ const showLoggedContainer = () => {
   loggedContainer.style.display = 'flex';
 };
 
-const fillLoggedContainer = ({
-  first_name,
-  last_name
-}: {
-  first_name: string;
-  last_name: string;
-}) => {
+const fillLoggedContainer = () => {
   const userElement = document.getElementById('user');
 
-  userElement.innerText = `Hello ${first_name} ${last_name}`;
+  userElement.innerText = `Hello ${State.user.first_name} ${State.user.last_name}`;
 };
 
 const hideLoggedContainer = () => {
@@ -78,10 +100,10 @@ const showProjectContainer = () => {
   projectContainer.style.display = 'flex';
 };
 
-const fillProjectContainer = (options: Array<{ id: string; name: string }>) => {
+const fillProjectContainer = () => {
   const projectsDropdown = document.getElementById('projects-dropdown');
 
-  options.forEach((option) => {
+  State.projects.forEach((option) => {
     const opt = document.createElement('option');
 
     opt.value = option.id;
@@ -109,11 +131,11 @@ const hideLoadingContainer = () => {
   loadingContainer.style.display = 'none';
 };
 
-const afterLogin = async ({ first_name, last_name }: { first_name: string; last_name: string }) => {
+const afterLogin = async () => {
   hideLoginForm();
 
   showLoggedContainer();
-  fillLoggedContainer({ first_name, last_name });
+  fillLoggedContainer();
 
   const projectsResponse = await fetchProjects();
 
@@ -124,12 +146,12 @@ const afterLogin = async ({ first_name, last_name }: { first_name: string; last_
     return;
   }
 
-  const projects = projectsResponse.data.projects;
+  const projects = projectsResponse.data.projects as ProjectType[];
+
+  State.projects = projects;
 
   showProjectContainer();
-  fillProjectContainer(
-    projects.map(({ id, name }: { id: string; name: string }) => ({ id, name }))
-  );
+  fillProjectContainer();
 };
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -147,9 +169,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const user = meResponse.data.user;
+    const user = meResponse.data.user as LoggedUserType;
 
-    await afterLogin({ first_name: user.first_name, last_name: user.last_name });
+    State.user = user;
+
+    await afterLogin();
   } catch (error) {
     // eslint-disable-next-line no-alert
     alert(`Auto Login error:${(error as Error).message}`);
@@ -168,11 +192,15 @@ document.getElementById('login-form').addEventListener('submit', async (event) =
     // eslint-disable-next-line no-alert
     alert(authResponse.message);
 
-    const user = authResponse.data.user;
-
-    if (user) {
-      await afterLogin({ first_name: user.first_name, last_name: user.last_name });
+    if (!authResponse.data.user) {
+      return;
     }
+
+    const user = authResponse.data.user as LoggedUserType;
+
+    State.user = user;
+
+    await afterLogin();
   } catch (error) {
     // eslint-disable-next-line no-alert
     alert(`Login error:${(error as Error).message}`);
@@ -187,6 +215,16 @@ document.getElementById('start-server-button').addEventListener('click', () => {
   const startServerButton = document.getElementById('start-server-button');
 
   startServerButton.style.display = 'none';
+
+  const currentProject = State.projects.find((project) => project.id === projectsDropdown.value);
+
+  window.api.startOPCClient(currentProject.opc_url, currentProject.opc_namespace_index);
+
+  window.api.onOPCClientResponse((message) => {
+    const spinnerText = document.getElementById('spinner-text');
+
+    spinnerText.innerText = message;
+  });
 
   showLoadingContainer();
 });
