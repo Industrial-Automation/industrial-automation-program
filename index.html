@@ -1,36 +1,40 @@
 <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Form</title>
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-    <div class='container'>
-      <h1 class="title">Industrial Automation</h1>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>Login Form</title>
+  <link rel='stylesheet' href='style.css'>
+</head>
+<body>
+<div class='container'>
+  <h1 class='title'>Industrial Automation</h1>
 
-      <form class="form" id="login-form">
-        <div class="form-item">
-          <label class="label" for="email">Email:</label>
-          <input class="input" type="email" id="email" name="email" placeholder="Enter Email" required>
-        </div>
-
-       <div class="form-item">
-         <label class="label" for="password">Password:</label>
-         <input class="input" type="password" id="password" name="password" placeholder="Enter Password" required>
-       </div>
-
-        <button class="loginBtn" type="submit">Login</button>
-      </form>
-
-      <div id="loading-container">
-        <div class="spinner"></div>
-
-        <p>The server is running...</p>
-      </div>
+  <form class='form' id='login-form'>
+    <div class='form-item'>
+      <label class='label' for='email'>Email:</label>
+      <input class='input' type='email' id='email' name='email' placeholder='Enter Email' required>
     </div>
 
-    <script src="./dist/renderer.js"></script>
-  </body>
+    <div class='form-item'>
+      <label class='label' for='password'>Password:</label>
+      <input class='input' type='password' id='password' name='password' placeholder='Enter Password' required>
+    </div>
+
+    <button class='loginBtn' type='submit'>Login</button>
+  </form>
+
+  <div class='logged-container' id='logged'>
+    <p class='logged-user' id='user'></p>
+
+    <div class='loading-container'>
+      <div class='spinner'></div>
+
+      <p class='spinner-text'>The server is running...</p>
+    </div>
+  </div>
+</div>
+
+<script src='./dist/renderer.js'></script>
+</body>
 </html>

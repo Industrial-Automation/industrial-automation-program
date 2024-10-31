@@ -68,26 +68,47 @@ body {
   color: white;
 }
 
+.logged-container {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  margin-top: 2rem;
+}
+
+.logged-user {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: white;
+  border: 1px solid white;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
 .loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  font-family: Arial, sans-serif;
+  gap: 1.5rem;
 }
 
 .spinner {
-  width: 40px;
-  height: 40px;
+  width: 2.5rem;
+  height: 2.5rem;
   border: 4px solid rgba(0, 0, 0, 0.1);
   border-top-color: #3498db;
   border-radius: 50%;
   animation: spin 1s infinite linear;
-  margin-bottom: 10px;
 }
 
-/* Spinner Animation */
+.spinner-text {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: white;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
