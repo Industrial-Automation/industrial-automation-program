@@ -2,8 +2,6 @@ import * as path from 'path';
 
 import { app, BrowserWindow } from 'electron';
 
-import { Configuration } from './config';
-
 require('dotenv').config();
 
 const createWindow = () => {
@@ -11,8 +9,10 @@ const createWindow = () => {
     width: 800,
     height: 600,
     webPreferences: {
-      devTools: Configuration.NODE_ENV === 'development',
-      preload: path.join(__dirname, 'preload.js')
+      devTools: process.env.NODE_ENV === 'development',
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false
     },
     autoHideMenuBar: true
   });

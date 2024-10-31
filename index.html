@@ -12,8 +12,8 @@
 
       <form class="form" id="login-form">
         <div class="form-item">
-          <label class="label" for="username">Email:</label>
-          <input class="input" type="text" id="username" name="username" placeholder="Enter Email" required>
+          <label class="label" for="email">Email:</label>
+          <input class="input" type="email" id="email" name="email" placeholder="Enter Email" required>
         </div>
 
        <div class="form-item">
@@ -23,6 +23,12 @@
 
         <button class="loginBtn" type="submit">Login</button>
       </form>
+
+      <div id="loading-container">
+        <div class="spinner"></div>
+
+        <p>The server is running...</p>
+      </div>
     </div>
 
     <script src="./dist/renderer.js"></script>
