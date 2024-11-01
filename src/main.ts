@@ -2,8 +2,8 @@ import * as path from 'path';
 import * as async from 'async';
 
 import * as fetch from 'node-fetch';
-import { app, BrowserWindow, ipcMain } from 'electron';
-import { AttributeIds, ClientSession, OPCUAClient } from 'node-opcua';
+import { app, BrowserWindow, ipcMain, session } from 'electron';
+import { AttributeIds, ClientSession, DataType, OPCUAClient } from 'node-opcua';
 
 require('dotenv').config({
   path: app.isPackaged
@@ -84,9 +84,14 @@ ipcMain.on(
       },
       () => {
         setInterval(async () => {
+          const cookies = await session.defaultSession.cookies.get({});
+
+          const cookieString = cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join('; ');
+
           const tagsResponse = await fetch(`${process.env.API_URL}/project-tags/${project_id}`, {
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              cookie: cookieString
             }
           });
 
@@ -94,12 +99,24 @@ ipcMain.on(
 
           const tags = tagsResult.data.tags as Array<{ tag: string; value: boolean | number }>;
 
-          tags.forEach(({ tag, value }) =>
+          tags.forEach(({ tag, value }) => {
+            const dataType =
+              typeof value === 'boolean'
+                ? DataType.Boolean
+                : typeof value === 'number'
+                  ? Number.isInteger(value)
+                    ? DataType.Int16
+                    : DataType.Double
+                  : DataType.Null;
+
             clientSession.write(
               {
                 nodeId: `ns=${opc_namespace_index};s=${tag}`,
+                attributeId: AttributeIds.Value,
+                indexRange: null,
                 value: {
                   value: {
+                    dataType,
                     value
                   }
                 }
@@ -112,8 +129,8 @@ ipcMain.on(
                   );
                 }
               }
-            )
-          );
+            );
+          });
         }, 3000);
 
         setInterval(() => {
