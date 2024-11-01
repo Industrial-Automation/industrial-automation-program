@@ -218,7 +218,11 @@ document.getElementById('start-server-button').addEventListener('click', () => {
 
   const currentProject = State.projects.find((project) => project.id === projectsDropdown.value);
 
-  window.api.startOPCClient(currentProject.opc_url, currentProject.opc_namespace_index);
+  window.api.startOPCClient(
+    currentProject.id,
+    currentProject.opc_url,
+    currentProject.opc_namespace_index
+  );
 
   window.api.onOPCClientResponse((message) => {
     const spinnerText = document.getElementById('spinner-text');
