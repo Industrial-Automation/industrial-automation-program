@@ -121,8 +121,8 @@ ipcMain.on(
                   }
                 }
               },
-              (err) => {
-                if (err) {
+              (err, status) => {
+                if (err || status.value !== 0) {
                   event.sender.send(
                     'opc-client-response',
                     `Write Value error: ${opc_url}; Tag: ${tag}`
