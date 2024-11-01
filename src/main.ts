@@ -171,13 +171,22 @@ ipcMain.on(
                   return;
                 }
 
+                const value = dataValue.value.value;
+
+                const formattedValue =
+                  typeof value === 'number' ? Math.round(value * 100) / 100 : value;
+
                 await fetch(`${process.env.API_URL}/project-tags/${project_id}`, {
                   method: 'PATCH',
                   headers: {
                     'Content-Type': 'application/json',
                     cookie: cookieString
                   },
-                  body: JSON.stringify({ id, table, value: dataValue.value.value })
+                  body: JSON.stringify({
+                    id,
+                    table,
+                    value: formattedValue
+                  })
                 });
               }
             );
