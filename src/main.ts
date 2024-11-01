@@ -88,12 +88,15 @@ ipcMain.on(
 
           const cookieString = cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join('; ');
 
-          const tagsResponse = await fetch(`${process.env.API_URL}/project-tags/${project_id}`, {
-            headers: {
-              'Content-Type': 'application/json',
-              cookie: cookieString
+          const tagsResponse = await fetch(
+            `${process.env.API_URL}/project-tags/writable/${project_id}`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                cookie: cookieString
+              }
             }
-          });
+          );
 
           const tagsResult: any = await tagsResponse.json();
 
@@ -133,24 +136,53 @@ ipcMain.on(
           });
         }, 3000);
 
-        setInterval(() => {
-          clientSession.read(
+        setInterval(async () => {
+          const cookies = await session.defaultSession.cookies.get({});
+
+          const cookieString = cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join('; ');
+
+          const tagsResponse = await fetch(
+            `${process.env.API_URL}/project-tags/readable/${project_id}`,
             {
-              nodeId: `ns=${opc_namespace_index};s="OPC_UA_DB".test`,
-              attributeId: AttributeIds.Value
-            },
-            (err, dataValue) => {
-              if (err || dataValue.statusCode.value !== 0) {
-                event.sender.send('opc-client-response', `Read Value error: ${opc_url}; Tag: tag}`);
-
-                return;
+              headers: {
+                'Content-Type': 'application/json',
+                cookie: cookieString
               }
-
-              // eslint-disable-next-line no-console
-              console.log(`value1: ${dataValue.value.value}`);
             }
           );
-        }, 1000);
+
+          const tagsResult: any = await tagsResponse.json();
+
+          const tags = tagsResult.data.tags as Array<{ id: string; tag: string; table: string }>;
+
+          tags.forEach(({ id, tag, table }) => {
+            clientSession.read(
+              {
+                nodeId: `ns=${opc_namespace_index};s=${tag}`,
+                attributeId: AttributeIds.Value
+              },
+              async (err, dataValue) => {
+                if (err || dataValue.statusCode.value !== 0) {
+                  event.sender.send(
+                    'opc-client-response',
+                    `Read Value error: ${opc_url}; Tag: ${tag}`
+                  );
+
+                  return;
+                }
+
+                await fetch(`${process.env.API_URL}/project-tags/${project_id}`, {
+                  method: 'PATCH',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    cookie: cookieString
+                  },
+                  body: JSON.stringify({ id, table, value: dataValue.value.value })
+                });
+              }
+            );
+          });
+        }, 3000);
       }
     ]);
   }
