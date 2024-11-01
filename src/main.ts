@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as async from 'async';
 
-import fetch from 'node-fetch';
+import * as fetch from 'node-fetch';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { AttributeIds, ClientSession, OPCUAClient } from 'node-opcua';
 
