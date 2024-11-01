@@ -106,7 +106,7 @@ ipcMain.on(
                 : typeof value === 'number'
                   ? Number.isInteger(value)
                     ? DataType.Int16
-                    : DataType.Double
+                    : DataType.Float
                   : DataType.Null;
 
             clientSession.write(
@@ -140,8 +140,8 @@ ipcMain.on(
               attributeId: AttributeIds.Value
             },
             (err, dataValue) => {
-              if (err) {
-                event.sender.send('opc-client-response', `Read Value error: ${opc_url}`);
+              if (err || dataValue.statusCode.value !== 0) {
+                event.sender.send('opc-client-response', `Read Value error: ${opc_url}; Tag: tag}`);
 
                 return;
               }
