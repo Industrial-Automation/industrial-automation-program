@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as async from 'async';
 
+import fetch from 'node-fetch';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { AttributeIds, ClientSession, OPCUAClient } from 'node-opcua';
 
@@ -89,7 +90,7 @@ ipcMain.on(
             }
           });
 
-          const tagsResult = await tagsResponse.json();
+          const tagsResult: any = await tagsResponse.json();
 
           const tags = tagsResult.data.tags as Array<{ tag: string; value: boolean | number }>;
 
