@@ -98,6 +98,68 @@ ipcMain.on(
 
           const cookieString = cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join('; ');
 
+          const writableTagsResponse = await fetch(
+            `${process.env.API_URL}/project-tags/writable/${project_id}`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                cookie: cookieString
+              }
+            }
+          );
+
+          const writableTagsResult: any = await writableTagsResponse.json();
+
+          const writableTags = writableTagsResult.data.tags as Array<{
+            tag: string;
+            value: boolean | number;
+          }>;
+
+          await Promise.all(
+            writableTags.map(({ tag, value }) => {
+              if (tagsState[tag] === value) {
+                return new Promise((resolve) => resolve(true));
+              }
+
+              const dataType =
+                typeof value === 'boolean'
+                  ? DataType.Boolean
+                  : typeof value === 'number'
+                    ? Number.isInteger(value)
+                      ? DataType.Int16
+                      : DataType.Float
+                    : DataType.Null;
+
+              return new Promise((resolve) => {
+                clientSession.write(
+                  {
+                    nodeId: `ns=${opc_namespace_index};s=${tag}`,
+                    attributeId: AttributeIds.Value,
+                    indexRange: null,
+                    value: {
+                      value: {
+                        dataType,
+                        value
+                      }
+                    }
+                  },
+                  (err, status) => {
+                    if (err || status.value !== 0) {
+                      event.sender.send(
+                        'opc-client-response',
+                        `Write Value error: ${opc_url}; Tag: ${tag}`
+                      );
+                    }
+
+                    tagsState[tag] = value;
+
+                    resolve(true);
+                  }
+                );
+              });
+            })
+          );
+
           const readableTagsResponse = await fetch(
             `${process.env.API_URL}/project-tags/readable/${project_id}`,
             {
@@ -159,64 +221,6 @@ ipcMain.on(
                         value: formattedValue
                       })
                     });
-
-                    resolve(true);
-                  }
-                );
-              });
-            })
-          );
-
-          const writableTagsResponse = await fetch(
-            `${process.env.API_URL}/project-tags/writable/${project_id}`,
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                cookie: cookieString
-              }
-            }
-          );
-
-          const writableTagsResult: any = await writableTagsResponse.json();
-
-          const writableTags = writableTagsResult.data.tags as Array<{
-            tag: string;
-            value: boolean | number;
-          }>;
-
-          await Promise.all(
-            writableTags.map(({ tag, value }) => {
-              const dataType =
-                typeof value === 'boolean'
-                  ? DataType.Boolean
-                  : typeof value === 'number'
-                    ? Number.isInteger(value)
-                      ? DataType.Int16
-                      : DataType.Float
-                    : DataType.Null;
-
-              return new Promise((resolve) => {
-                clientSession.write(
-                  {
-                    nodeId: `ns=${opc_namespace_index};s=${tag}`,
-                    attributeId: AttributeIds.Value,
-                    indexRange: null,
-                    value: {
-                      value: {
-                        dataType,
-                        value
-                      }
-                    }
-                  },
-                  (err, status) => {
-                    if (err || status.value !== 0) {
-                      event.sender.send(
-                        'opc-client-response',
-                        `Write Value error: ${opc_url}; Tag: ${tag}`
-                      );
-                    }
-
-                    tagsState[tag] = value;
 
                     resolve(true);
                   }
