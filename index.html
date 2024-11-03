@@ -1,30 +1,50 @@
 <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Form</title>
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-    <div class='container'>
-      <h1 class="title">Industrial Automation</h1>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
 
-      <form class="form" id="login-form">
-        <div class="form-item">
-          <label class="label" for="username">Email:</label>
-          <input class="input" type="text" id="username" name="username" placeholder="Enter Email" required>
-        </div>
+  <title>Industrial Automation</title>
 
-       <div class="form-item">
-         <label class="label" for="password">Password:</label>
-         <input class="input" type="password" id="password" name="password" placeholder="Enter Password" required>
-       </div>
+  <link rel='stylesheet' href='style.css'>
+</head>
+<body>
+<div class='container'>
+  <h1 class='title'>Industrial Automation</h1>
 
-        <button class="loginBtn" type="submit">Login</button>
-      </form>
+  <form id='login-form' class='form'>
+    <div class='form-item'>
+      <label class='label' for='email'>Email:</label>
+      <input class='input' type='email' id='email' name='email' placeholder='Enter Email' required>
     </div>
 
-    <script src="./dist/renderer.js"></script>
-  </body>
+    <div class='form-item'>
+      <label class='label' for='password'>Password:</label>
+      <input class='input' type='password' id='password' name='password' placeholder='Enter Password' required>
+    </div>
+
+    <button class='login-btn' type='submit'>Login</button>
+  </form>
+
+  <div id='logged-container' class='logged-container'>
+    <p class='logged-user' id='user'></p>
+  </div>
+
+  <div id='project-container' class='project-container'>
+    <label for='projects-dropdown' class='project-dropdown-label'>Select Project:</label>
+
+    <select id='projects-dropdown' class='projects-dropdown'></select>
+
+    <button id='start-server-button' class='start-server-btn'>Start Server</button>
+  </div>
+
+  <div id='loading-container' class='loading-container'>
+    <div class='spinner'></div>
+
+    <p id="spinner-text" class='spinner-text'>The server is running...</p>
+  </div>
+</div>
+
+<script src='./dist/renderer.js'></script>
+</body>
 </html>
