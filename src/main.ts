@@ -97,7 +97,9 @@ ipcMain.on(
 
             isSyncActive = true;
 
-            const cookies = await session.defaultSession.cookies.get({});
+            const cookies = await session.defaultSession.cookies.get({
+              domain: new URL(process.env.API_URL).hostname
+            });
 
             const cookieString = cookies
               .map((cookie) => `${cookie.name}=${cookie.value}`)
