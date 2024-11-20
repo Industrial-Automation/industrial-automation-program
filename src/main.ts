@@ -201,7 +201,13 @@ ipcMain.on(
                     const value = dataValue.value.value;
 
                     const formattedValue =
-                      typeof value === 'number' ? Math.round(value * 100) / 100 : value;
+                      typeof value === 'number'
+                        ? Math.round(value * 100) / 100
+                        : typeof value === 'boolean'
+                          ? value
+                            ? 1
+                            : 0
+                          : value;
 
                     if (tagsState[tag] === formattedValue) {
                       resolve(true);
