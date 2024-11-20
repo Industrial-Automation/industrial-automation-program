@@ -204,7 +204,7 @@ ipcMain.on(
                     const formattedValue =
                       typeof value === 'number'
                         ? Math.round(value * 100) / 100
-                        : typeof value === 'boolean'
+                        : typeof value === 'boolean' && table === 'schema_bulbs'
                           ? value
                             ? 1
                             : 0
