@@ -156,6 +156,10 @@ ipcMain.on(
                           'opc-client-response',
                           `Write Value error: ${opc_url}; Tag: ${tag}`
                         );
+
+                        resolve(true);
+
+                        return;
                       }
 
                       tagsState[tag] = value;
