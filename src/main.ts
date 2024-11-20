@@ -4,6 +4,7 @@ import * as async from 'async';
 import * as fetch from 'node-fetch';
 import { app, BrowserWindow, ipcMain, session } from 'electron';
 import { AttributeIds, ClientSession, DataType, OPCUAClient } from 'node-opcua';
+import { wrapInQuotes } from './utils';
 
 require('dotenv').config({
   path: app.isPackaged
@@ -133,7 +134,7 @@ ipcMain.on(
               return new Promise((resolve) => {
                 clientSession.write(
                   {
-                    nodeId: `ns=${opc_namespace_index};s=${tag}`,
+                    nodeId: `ns=${opc_namespace_index};s=${wrapInQuotes(tag)}`,
                     attributeId: AttributeIds.Value,
                     indexRange: null,
                     value: {
@@ -183,7 +184,7 @@ ipcMain.on(
               return new Promise((resolve) => {
                 clientSession.read(
                   {
-                    nodeId: `ns=${opc_namespace_index};s=${tag}`,
+                    nodeId: `ns=${opc_namespace_index};s=${wrapInQuotes(tag)}`,
                     attributeId: AttributeIds.Value
                   },
                   async (err, dataValue) => {
